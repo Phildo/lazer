@@ -10,6 +10,8 @@ var GamePlayScene = function(game, stage)
   var hoverer;
   var keyer;
   var cam;
+  var shakecam;
+  var shake;
   var mouse;
   var mouselistener;
   var man;
@@ -44,6 +46,21 @@ var GamePlayScene = function(game, stage)
     cam.wy = 0;
     cam.ww = 2;
     cam.wh = 1;
+    shakecam = new obj();
+    shakecam.wx = 0;
+    shakecam.wy = 0;
+    shakecam.ww = 2;
+    shakecam.wh = 1;
+    var shake =
+    {
+      x:0,
+      y:0,
+      vx:0,
+      vy:0,
+      to_x:0,
+      to_y:0,
+      amt:0,
+    }
 
     mouselistener = new obj();
     mouselistener.x = 0;
@@ -169,7 +186,8 @@ var GamePlayScene = function(game, stage)
     cam.wx = lerp(cam.wx,man.wx,0.05);
     cam.wy = lerp(cam.wy,man.wy,0.05);
 
-    worldSpace(cam,canv,mouse);
+    compositeShake();
+    worldSpace(shakecam,canv,mouse);
 
     if(man.shift) chargeLazer();
     else          dischargeLazer();
@@ -177,10 +195,10 @@ var GamePlayScene = function(game, stage)
 
   self.draw = function()
   {
-    screenSpace(cam,canv,grid);
+    screenSpace(shakecam,canv,grid);
     grid.draw();
 
-    screenSpace(cam,canv,man);
+    screenSpace(shakecam,canv,man);
     ctx.fillRect(man.x,man.y,man.w,man.h);
     positionLazerToMan();
     drawLazer();
@@ -221,6 +239,30 @@ var GamePlayScene = function(game, stage)
   {
   };
 
+  var shakeshake = function(s)
+  {
+    shake.amt += s;
+    var theta = Math.random()*Math.PI*2;
+    shake.to_x = Math.cos(theta)*amt;
+    shake.to_y = Math.sin(theta)*amt;
+  }
+  var tickshake = function()
+  {
+    if(shake.amt > 0.1 && (shake.to_x-shake.x)/shake.vx < 0) //don't bother reshaking if so close to 0
+    {
+      shake.amt *= 0.9;
+      shakeshake(0);
+    }
+    shake.vx += (shake.to_x-shake.x)/100;
+    shake.vy += (shake.to_y-shake.y)/100;
+    shake.x += shake.vx;
+    shake.y += shake.vy;
+  }
+  var compositeShake = function()
+  {
+    shakecam.wx = cam.wx;
+    shakecam.wy = cam.wy;
+  }
   var positionLazerToMan = function()
   {
     if(man.x > lazer.w+10) lazer.to_x = man.x-lazer.w-5;
