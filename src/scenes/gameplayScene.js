@@ -51,7 +51,7 @@ var GamePlayScene = function(game, stage)
     shakecam.wy = 0;
     shakecam.ww = 2;
     shakecam.wh = 1;
-    var shake =
+    shake =
     {
       x:0,
       y:0,
@@ -91,22 +91,22 @@ var GamePlayScene = function(game, stage)
         case 0:
           m.x = 20;
           m.y = 20;
-          m.hover = function(evt) { mouse_hit_tl = true; }
+          m.hover = function(evt) { if(!mouse_hit_tl) shakeshake(.1); mouse_hit_tl = true; }
           break;
         case 1:
           m.x = canv.width-m.w-20;
           m.y = 20;
-          m.hover = function(evt) { mouse_hit_tr = true; }
+          m.hover = function(evt) { if(!mouse_hit_tr) shakeshake(.1); mouse_hit_tr = true; }
           break;
         case 2:
           m.x = 20;
           m.y = canv.height-m.h-20;
-          m.hover = function(evt) { mouse_hit_bl = true; }
+          m.hover = function(evt) { if(!mouse_hit_bl) shakeshake(.1); mouse_hit_bl = true; }
           break;
         case 3:
           m.x = canv.width-m.w-20;
           m.y = canv.height-m.h-20;
-          m.hover = function(evt) { mouse_hit_br = true; }
+          m.hover = function(evt) { if(!mouse_hit_br) shakeshake(.1); mouse_hit_br = true; }
           break;
       }
       m.unhover = function(evt) {}
@@ -186,6 +186,7 @@ var GamePlayScene = function(game, stage)
     cam.wx = lerp(cam.wx,man.wx,0.05);
     cam.wy = lerp(cam.wy,man.wy,0.05);
 
+    tickshake();
     compositeShake();
     worldSpace(shakecam,canv,mouse);
 
@@ -243,25 +244,27 @@ var GamePlayScene = function(game, stage)
   {
     shake.amt += s;
     var theta = Math.random()*Math.PI*2;
-    shake.to_x = Math.cos(theta)*amt;
-    shake.to_y = Math.sin(theta)*amt;
+    shake.to_x = Math.cos(theta)*shake.amt;
+    shake.to_y = Math.sin(theta)*shake.amt;
   }
   var tickshake = function()
   {
-    if(shake.amt > 0.1 && (shake.to_x-shake.x)/shake.vx < 0) //don't bother reshaking if so close to 0
+    if(shake.amt > 0.001 && (shake.to_x-shake.x)/shake.vx < 0) //don't bother reshaking if so close to 0
     {
-      shake.amt *= 0.9;
+      shake.amt *= 0.8;
       shakeshake(0);
     }
-    shake.vx += (shake.to_x-shake.x)/100;
-    shake.vy += (shake.to_y-shake.y)/100;
+    shake.vx += (shake.to_x-shake.x)/2;
+    shake.vy += (shake.to_y-shake.y)/2;
+    shake.vx *= 0.9;
+    shake.vy *= 0.9;
     shake.x += shake.vx;
     shake.y += shake.vy;
   }
   var compositeShake = function()
   {
-    shakecam.wx = cam.wx;
-    shakecam.wy = cam.wy;
+    shakecam.wx = cam.wx+shake.x;
+    shakecam.wy = cam.wy+shake.y;
   }
   var positionLazerToMan = function()
   {
