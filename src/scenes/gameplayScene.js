@@ -468,16 +468,31 @@ var GamePlayScene = function(game, stage)
     var theta = Math.random()*Math.PI*2;
     e.wx = Math.cos(theta)*2;
     e.wy = Math.sin(theta)*2;
+    return e;
   }
 
   var drawEnemies = function()
   {
-
+    for(var i = 0; i < enemies.length; i++)
+    {
+      screenSpace(shakecam,canv,enemies[i]);
+      ctx.fillRect(enemies[i].x,enemies[i].y,enemies[i].w,enemies[i].h);
+    }
   }
 
   var tickEnemies = function()
   {
-
+    var e;
+    for(var i = 0; i < enemies.length; i++)
+    {
+      e = enemies[i];
+      e.vwx += (man.wx-e.wx)/200;
+      e.vwy += (man.wy-e.wy)/200;
+      e.vwx *= 0.9;
+      e.vwy *= 0.9;
+      e.wx += e.vwx;
+      e.wy += e.vwy;
+    }
   }
 
   var obj = function()
