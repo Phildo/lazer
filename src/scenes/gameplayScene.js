@@ -20,6 +20,8 @@ var GamePlayScene = function(game, stage)
   var grid;
   var lazer;
 
+  var enemies;
+
   var mouse_detects;
 
   var mouse_hit;
@@ -32,6 +34,8 @@ var GamePlayScene = function(game, stage)
   var input_a;
   var input_s;
   var input_d;
+  var input_shift;
+  var input_space;
 
   self.ready = function()
   {
@@ -41,8 +45,6 @@ var GamePlayScene = function(game, stage)
 
     ctx.fillStyle = "#000000";
     ctx.strokeStyle = "#000000";
-    ctx.font = "Bold 250px Arial";
-    ctx.textAlign = "center";
 
     cam = new obj();
     cam.wx = 0;
@@ -140,15 +142,14 @@ var GamePlayScene = function(game, stage)
     man.key_letter = function(k){}
     man.key_down = function(k)
     {
-      console.log(k.keyCode);
       switch(k.keyCode)
       {
-        case 16: man.shift = true; break;
+        case 16: man.shift = true; input_shift = true; break;
         case 87: man.up    = true; input_wasd = true; input_w = true; break;
         case 65: man.left  = true; input_wasd = true; input_a = true; break;
         case 83: man.down  = true; input_wasd = true; input_s = true; break;
         case 68: man.right = true; input_wasd = true; input_d = true; break;
-        case 32: man.space = true; break;
+        case 32: man.space = true; input_space = true; break;
       }
     }
     man.key_up = function(k)
@@ -172,6 +173,8 @@ var GamePlayScene = function(game, stage)
     lazer.w = 100;
     lazer.h = 200;
 
+    enemies = [];
+
     grid = new Grid();
     grid.wx = 0;
     grid.wy = 0;
@@ -188,6 +191,8 @@ var GamePlayScene = function(game, stage)
     input_a = false;
     input_s = false;
     input_d = false;
+    input_shift = false;
+    input_space = false;
   };
 
   self.tick = function()
@@ -225,6 +230,14 @@ var GamePlayScene = function(game, stage)
 
     if(man.shift) chargeLazer();
     else          dischargeLazer();
+
+    //'in game'
+    if(input_shift || (input_w && input_a && input_s && input_d && mouse_hit_tl && mouse_hit_tr && mouse_hit_bl && mouse_hit_br))
+    {
+      if(n_ticks % 200 == 0)
+        enemies.push(genEnemy());
+    }
+    tickEnemies();
   };
 
   self.draw = function()
@@ -271,19 +284,25 @@ var GamePlayScene = function(game, stage)
     if(!mouse_hit_bl) ctx.drawImage(mouseHit,mouse_detects[2].x,mouse_detects[2].y,mouse_detects[2].w,mouse_detects[2].h);
     if(!mouse_hit_br) ctx.drawImage(mouseHit,mouse_detects[3].x,mouse_detects[3].y,mouse_detects[3].w,mouse_detects[3].h);
 
+    ctx.font = "Bold 250px Arial";
+    ctx.textAlign = "center";
     if(man.shift)
     {
     }
     else
     {
       if(input_w && input_a && input_s && input_d && mouse_hit_tl && mouse_hit_tr && mouse_hit_bl && mouse_hit_br && n_ticks % 100 < 50)
+      {
         ctx.fillText ("SHIFT",canv.width/2,canv.height+10);
+      }
     }
 
     if(!input_w) ctx.fillText ("W",canv.width/2,canv.height/2+40);
     if(!input_a) ctx.fillText ("A",canv.width/2-100,canv.height/2+140);
     if(!input_s) ctx.fillText ("S",canv.width/2,canv.height/2+140);
     if(!input_d) ctx.fillText ("D",canv.width/2+100,canv.height/2+140);
+
+    drawEnemies();
   };
 
   self.cleanup = function()
@@ -375,6 +394,9 @@ var GamePlayScene = function(game, stage)
   }
   var drawLazer = function()
   {
+    ctx.textAlign = "left";
+    ctx.font = "Bold 20px Arial";
+    //ctx.fillText("CHARGE:",lazer.x,lazer.y);
     ctx.strokeRect(lazer.x,lazer.y,lazer.w,lazer.h);
     var p = 2;
     var bh = ((lazer.h-10)+p)/10;
@@ -436,6 +458,26 @@ var GamePlayScene = function(game, stage)
         else lazer.charges[lazer.level] = 0;
       }
     }
+  }
+
+  var genEnemy = function()
+  {
+    var e = new phys();
+    e.ww = 0.1;
+    e.wh = 0.1;
+    var theta = Math.random()*Math.PI*2;
+    e.wx = Math.cos(theta)*2;
+    e.wy = Math.sin(theta)*2;
+  }
+
+  var drawEnemies = function()
+  {
+
+  }
+
+  var tickEnemies = function()
+  {
+
   }
 
   var obj = function()
