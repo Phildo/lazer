@@ -20,6 +20,7 @@ var GamePlayScene = function(game, stage)
 
   var mouse_detects;
 
+  var mouse_hit;
   var mouse_hit_tl;
   var mouse_hit_tr;
   var mouse_hit_bl;
@@ -74,6 +75,7 @@ var GamePlayScene = function(game, stage)
     mouse.h = 1;
     mouselistener.hover = function(evt)
     {
+      mouse_hit = true;
       mouse.x = evt.doX-0.5;
       mouse.y = evt.doY-0.5;
     }
@@ -160,6 +162,7 @@ var GamePlayScene = function(game, stage)
     grid.ww = 1;
     grid.wh = 1;
 
+    mouse_hit = false;
     mouse_hit_tl = false;
     mouse_hit_tr = false;
     mouse_hit_bl = false;
@@ -204,17 +207,16 @@ var GamePlayScene = function(game, stage)
     positionLazerToMan();
     drawLazer();
 
-    //mouse
-    ctx.beginPath();
-    ctx.moveTo(mouse.x-10,mouse.y);
-    ctx.lineTo(mouse.x-4,mouse.y);
-    ctx.moveTo(mouse.x+10,mouse.y);
-    ctx.lineTo(mouse.x+4,mouse.y);
-    ctx.moveTo(mouse.x,mouse.y-10);
-    ctx.lineTo(mouse.x,mouse.y-4);
-    ctx.moveTo(mouse.x,mouse.y+10);
-    ctx.lineTo(mouse.x,mouse.y+4);
-    ctx.stroke();
+    if(mouse_hit)
+    {
+      drawMouse();
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(man.x+man.w/2,man.y+man.h/2);
+      ctx.lineTo(mouse.x+mouse.w/2,mouse.y+mouse.h/2);
+      ctx.stroke();
+      ctx.lineWidth = 2;
+    }
 
     if(!mouse_hit_tl) ctx.drawImage(mouseHit,mouse_detects[0].x,mouse_detects[0].y,mouse_detects[0].w,mouse_detects[0].h);
     if(!mouse_hit_tr) ctx.drawImage(mouseHit,mouse_detects[1].x,mouse_detects[1].y,mouse_detects[1].w,mouse_detects[1].h);
@@ -308,6 +310,19 @@ var GamePlayScene = function(game, stage)
           ctx.drawImage(roundedRect,x+(rw+pad)*i,y,rw,h);
         break;
     }
+  }
+  var drawMouse = function()
+  {
+    ctx.beginPath();
+    ctx.moveTo(mouse.x-10,mouse.y);
+    ctx.lineTo(mouse.x-4,mouse.y);
+    ctx.moveTo(mouse.x+10,mouse.y);
+    ctx.lineTo(mouse.x+4,mouse.y);
+    ctx.moveTo(mouse.x,mouse.y-10);
+    ctx.lineTo(mouse.x,mouse.y-4);
+    ctx.moveTo(mouse.x,mouse.y+10);
+    ctx.lineTo(mouse.x,mouse.y+4);
+    ctx.stroke();
   }
   var drawLazer = function()
   {
