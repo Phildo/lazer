@@ -465,6 +465,7 @@ var GamePlayScene = function(game, stage)
   var genEnemy = function()
   {
     var e = new phys();
+    e.age = 0;
     e.ww = 0.1;
     e.wh = 0.1;
     var theta = Math.random()*Math.PI*2;
@@ -488,16 +489,21 @@ var GamePlayScene = function(game, stage)
     for(var i = 0; i < enemies.length; i++)
     {
       e = enemies[i];
-      e.vwx += (man.wx-e.wx)/200;
-      e.vwy += (man.wy-e.wy)/200;
-      e.vwx *= 0.9;
-      e.vwy *= 0.9;
-      e.wx += e.vwx;
-      e.wy += e.vwy;
+      e.age++;
+      if(e.age > 300) { enemies.splice(i,1); i--; }
+      else
+      {
+        e.vwx += (man.wx-e.wx)/200;
+        e.vwy += (man.wy-e.wy)/200;
+        e.vwx *= 0.9;
+        e.vwy *= 0.9;
+        e.wx += e.vwx;
+        e.wy += e.vwy;
 
-      var x = (e.wx-man.wx);
-      var y = (e.wy-man.wy);
-      if((x*x)+(y*y) < (e.ww*e.ww)) man.recover = 20;
+        var x = (e.wx-man.wx);
+        var y = (e.wy-man.wy);
+        if((x*x)+(y*y) < (e.ww*e.ww)) man.recover = 20;
+      }
     }
   }
 
