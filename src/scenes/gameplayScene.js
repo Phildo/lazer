@@ -11,10 +11,17 @@ var GamePlayScene = function(game, stage)
   var keyer;
   var cam;
   var mouse;
+  var mouselistener;
   var man;
   var grid;
   var lazer;
 
+  var mouse_detects;
+
+  var mouse_hit_tl;
+  var mouse_hit_tr;
+  var mouse_hit_bl;
+  var mouse_hit_br;
   var input_wasd;
   var input_w;
   var input_a;
@@ -55,6 +62,40 @@ var GamePlayScene = function(game, stage)
     }
     mouselistener.unhover = function(evt){}
     hoverer.register(mouselistener)
+
+    mouse_detects = [];
+    for(var i = 0; i < 4; i++)
+    {
+      var m = new obj();
+      m.w = 85;
+      m.h = 30;
+      switch(i)
+      {
+        case 0:
+          m.x = 20;
+          m.y = 20;
+          m.hover = function(evt) { mouse_hit_tl = true; }
+          break;
+        case 1:
+          m.x = canv.width-m.w-20;
+          m.y = 20;
+          m.hover = function(evt) { mouse_hit_tr = true; }
+          break;
+        case 2:
+          m.x = 20;
+          m.y = canv.height-m.h-20;
+          m.hover = function(evt) { mouse_hit_bl = true; }
+          break;
+        case 3:
+          m.x = canv.width-m.w-20;
+          m.y = canv.height-m.h-20;
+          m.hover = function(evt) { mouse_hit_br = true; }
+          break;
+      }
+      m.unhover = function(evt) {}
+      hoverer.register(m);
+      mouse_detects[i] = m;
+    }
 
     man = new phys();
     man.wx = 0;
@@ -102,6 +143,10 @@ var GamePlayScene = function(game, stage)
     grid.ww = 1;
     grid.wh = 1;
 
+    mouse_hit_tl = false;
+    mouse_hit_tr = false;
+    mouse_hit_bl = false;
+    mouse_hit_br = false;
     input_wasd = false;
     input_w = false;
     input_a = false;
@@ -151,6 +196,11 @@ var GamePlayScene = function(game, stage)
     ctx.moveTo(mouse.x,mouse.y+10);
     ctx.lineTo(mouse.x,mouse.y+4);
     ctx.stroke();
+
+    if(!mouse_hit_tl) ctx.drawImage(mouseHit,mouse_detects[0].x,mouse_detects[0].y,mouse_detects[0].w,mouse_detects[0].h);
+    if(!mouse_hit_tr) ctx.drawImage(mouseHit,mouse_detects[1].x,mouse_detects[1].y,mouse_detects[1].w,mouse_detects[1].h);
+    if(!mouse_hit_bl) ctx.drawImage(mouseHit,mouse_detects[2].x,mouse_detects[2].y,mouse_detects[2].w,mouse_detects[2].h);
+    if(!mouse_hit_br) ctx.drawImage(mouseHit,mouse_detects[3].x,mouse_detects[3].y,mouse_detects[3].w,mouse_detects[3].h);
 
     if(man.shift)
     {
@@ -390,5 +440,20 @@ var GamePlayScene = function(game, stage)
   roundedRect.context.arc(                  r,roundedRect.height-r,r,0,Math.PI*2);
   roundedRect.context.arc(roundedRect.width-r,roundedRect.height-r,r,0,Math.PI*2);
   roundedRect.context.fill();
+
+  var mouseHit = GenIcon(85,30);
+  var r = 8;
+  mouseHit.context.fillRect(r,0,mouseHit.width-(2*r),mouseHit.height);
+  mouseHit.context.fillRect(0,r,mouseHit.width,mouseHit.height-(2*r));
+  mouseHit.context.beginPath();
+  mouseHit.context.arc(               r,                r,r,0,Math.PI*2);
+  mouseHit.context.arc(mouseHit.width-r,                r,r,0,Math.PI*2);
+  mouseHit.context.arc(               r,mouseHit.height-r,r,0,Math.PI*2);
+  mouseHit.context.arc(mouseHit.width-r,mouseHit.height-r,r,0,Math.PI*2);
+  mouseHit.context.fill();
+  mouseHit.context.fillStyle = "#FFFFFF";
+  mouseHit.context.font = "Bold 20px Arial";
+  mouseHit.context.textAlign = "center";
+  mouseHit.context.fillText("MOUSE",mouseHit.width/2,mouseHit.height/2+10-2);
 };
 
