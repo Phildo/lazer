@@ -217,6 +217,8 @@ var GamePlayScene = function(game, stage)
     {
       shadow.wx = man.wx;
       shadow.wy = man.wy;
+      man.vwx = (mouse.wx-man.wx)/20;
+      man.vwy = (mouse.wy-man.wy)/20;
       man.wx = mouse.wx;
       man.wy = mouse.wy;
     }
@@ -274,7 +276,7 @@ var GamePlayScene = function(game, stage)
     }
     else
     {
-      if(input_wasd && n_ticks % 100 < 50)
+      if(input_w && input_a && input_s && input_d && mouse_hit_tl && mouse_hit_tr && mouse_hit_bl && mouse_hit_br && n_ticks % 100 < 50)
         ctx.fillText ("SHIFT",canv.width/2,canv.height+10);
     }
 
