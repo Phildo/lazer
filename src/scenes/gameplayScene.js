@@ -14,6 +14,7 @@ var GamePlayScene = function(game, stage)
   var shake;
   var mouse;
   var mouselistener;
+  var space;
   var man;
   var grid;
   var lazer;
@@ -116,6 +117,12 @@ var GamePlayScene = function(game, stage)
       mouse_detects[i] = m;
     }
 
+    space = new obj();
+    space.x = 0;
+    space.y = 0;
+    space.w = spaceBar.width;
+    space.h = spaceBar.height;
+
     man = new phys();
     man.wx = 0;
     man.wy = 0;
@@ -192,6 +199,9 @@ var GamePlayScene = function(game, stage)
     tickshake();
     compositeShake();
     worldSpace(shakecam,canv,mouse);
+
+    space.x = lerp(space.x,mouse.x+mouse.w/2-space.w/2,0.1);
+    space.y = lerp(space.y,mouse.y-20-space.h,0.1);
 
     if(man.shift) chargeLazer();
     else          dischargeLazer();
@@ -313,6 +323,7 @@ var GamePlayScene = function(game, stage)
   }
   var drawMouse = function()
   {
+    ctx.drawImage(spaceBar,space.x,space.y,space.w,space.h);
     ctx.beginPath();
     ctx.moveTo(mouse.x-10,mouse.y);
     ctx.lineTo(mouse.x-4,mouse.y);
@@ -515,5 +526,32 @@ var GamePlayScene = function(game, stage)
   mouseHit.context.font = "Bold 20px Arial";
   mouseHit.context.textAlign = "center";
   mouseHit.context.fillText("MOUSE",mouseHit.width/2,mouseHit.height/2+10-2);
+
+  var spaceBar = GenIcon(95,40);
+  var r = 8;
+  var s = 3;
+  spaceBar.context.translate(0,1); //wtf canvas? it's weirdly duplicating the bottom row of pixels...
+  spaceBar.context.fillStyle = "#000000";
+  spaceBar.context.fillRect(r,0,spaceBar.width-(2*r),spaceBar.height);
+  spaceBar.context.fillRect(0,r,spaceBar.width,spaceBar.height-(2*r));
+  spaceBar.context.beginPath();
+  spaceBar.context.arc(               r,                r,r,0,Math.PI*2);
+  spaceBar.context.arc(spaceBar.width-r,                r,r,0,Math.PI*2);
+  spaceBar.context.arc(               r,spaceBar.height-r,r,0,Math.PI*2);
+  spaceBar.context.arc(spaceBar.width-r,spaceBar.height-r,r,0,Math.PI*2);
+  spaceBar.context.fill();
+  spaceBar.context.fillStyle = "#FFFFFF";
+  spaceBar.context.fillRect(r+s,0+s,spaceBar.width-(2*r)-(2*s),spaceBar.height      -(2*s));
+  spaceBar.context.fillRect(0+s,r+s,spaceBar.width      -(2*s),spaceBar.height-(2*r)-(2*s));
+  spaceBar.context.beginPath();
+  spaceBar.context.arc(               r+s,                r+s,r,0,Math.PI*2);
+  spaceBar.context.arc(spaceBar.width-r-s,                r+s,r,0,Math.PI*2);
+  spaceBar.context.arc(               r+s,spaceBar.height-r-s,r,0,Math.PI*2);
+  spaceBar.context.arc(spaceBar.width-r-s,spaceBar.height-r-s,r,0,Math.PI*2);
+  spaceBar.context.fill();
+  spaceBar.context.fillStyle = "#000000";
+  spaceBar.context.font = "Bold 20px Arial";
+  spaceBar.context.textAlign = "center";
+  spaceBar.context.fillText("SPACE",spaceBar.width/2,spaceBar.height/2+10-2);
 };
 
