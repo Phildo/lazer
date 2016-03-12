@@ -15,6 +15,7 @@ var GamePlayScene = function(game, stage)
   var mouse;
   var mouselistener;
   var space;
+  var shadow;
   var man;
   var grid;
   var lazer;
@@ -122,6 +123,7 @@ var GamePlayScene = function(game, stage)
     space.y = 0;
     space.w = spaceBar.width;
     space.h = spaceBar.height;
+    space.charge = 0;
 
     man = new phys();
     man.wx = 0;
@@ -133,10 +135,12 @@ var GamePlayScene = function(game, stage)
     man.left = false;
     man.right = false;
     man.shift = false;
+    man.space = false;
     man.key = function(k){}
     man.key_letter = function(k){}
     man.key_down = function(k)
     {
+      console.log(k.keyCode);
       switch(k.keyCode)
       {
         case 16: man.shift = true; break;
@@ -144,6 +148,7 @@ var GamePlayScene = function(game, stage)
         case 65: man.left  = true; input_wasd = true; input_a = true; break;
         case 83: man.down  = true; input_wasd = true; input_s = true; break;
         case 68: man.right = true; input_wasd = true; input_d = true; break;
+        case 32: man.space = true; break;
       }
     }
     man.key_up = function(k)
@@ -155,9 +160,13 @@ var GamePlayScene = function(game, stage)
         case 65: man.left  = false; break;
         case 83: man.down  = false; break;
         case 68: man.right = false; break;
+        case 32: break; //do nothing
       }
     }
     keyer.register(man);
+    shadow = new obj();
+    shadow.ww = man.ww;
+    shadow.wh = man.wh;
 
     lazer = new Lazer();
     lazer.w = 100;
@@ -202,6 +211,15 @@ var GamePlayScene = function(game, stage)
 
     space.x = lerp(space.x,mouse.x+mouse.w/2-space.w/2,0.1);
     space.y = lerp(space.y,mouse.y-20-space.h,0.1);
+    space.charge+=0.1; if(space.charge > 1) space.charge = 1;
+
+    if(man.space)
+    {
+      shadow.wx = man.wx;
+      shadow.wy = man.wy;
+      man.wx = mouse.wx;
+      man.wy = mouse.wy;
+    }
 
     if(man.shift) chargeLazer();
     else          dischargeLazer();
@@ -214,6 +232,24 @@ var GamePlayScene = function(game, stage)
 
     screenSpace(shakecam,canv,man);
     ctx.fillRect(man.x,man.y,man.w,man.h);
+    if(man.space)
+    {
+      screenSpace(shakecam,canv,shadow);
+      ctx.beginPath();
+      ctx.moveTo(shadow.x,shadow.y);
+      ctx.lineTo(shadow.x,shadow.y+shadow.h);
+      ctx.lineTo(man.x,man.y+man.h);
+      ctx.lineTo(man.x,man.y);
+      ctx.closePath();
+      ctx.beginPath();
+      ctx.moveTo(shadow.x+shadow.w,shadow.y);
+      ctx.lineTo(shadow.x+shadow.w,shadow.y+shadow.h);
+      ctx.lineTo(man.x+man.w,man.y+man.h);
+      ctx.lineTo(man.x+man.w,man.y);
+      ctx.closePath();
+      ctx.fill();
+      man.space = false;
+    }
     positionLazerToMan();
     drawLazer();
 
