@@ -138,6 +138,7 @@ var GamePlayScene = function(game, stage)
     man.right = false;
     man.shift = false;
     man.space = false;
+    man.recover = 0;
     man.key = function(k){}
     man.key_letter = function(k){}
     man.key_down = function(k)
@@ -228,8 +229,9 @@ var GamePlayScene = function(game, stage)
       man.wy = mouse.wy;
     }
 
-    if(man.shift) chargeLazer();
-    else          dischargeLazer();
+    if(man.recover) man.recover--;
+    if(man.shift && !man.recover) chargeLazer();
+    else                          dischargeLazer();
 
     //'in game'
     if(input_shift || (input_w && input_a && input_s && input_d && mouse_hit_tl && mouse_hit_tr && mouse_hit_bl && mouse_hit_br))
@@ -492,6 +494,10 @@ var GamePlayScene = function(game, stage)
       e.vwy *= 0.9;
       e.wx += e.vwx;
       e.wy += e.vwy;
+
+      var x = (e.wx-man.wx);
+      var y = (e.wy-man.wy);
+      if((x*x)+(y*y) < (e.ww*e.ww)) man.recover = 20;
     }
   }
 
